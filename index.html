@@ -1,0 +1,340 @@
+index.html
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ร้านค้าสหกรณ์โรงเรียน</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', 'Inter', sans-serif; }
+        /* สไตล์สำหรับกล่องแจ้งเตือน */
+        #notification { transition: opacity 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Header / Navbar -->
+    <nav class="bg-indigo-600 text-white p-4 shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-bold tracking-tight">🏫 School Shop (ร้านสหกรณ์)</h1>
+            <!-- Cart Button -->
+            <button onclick="toggleCart()" class="flex items-center space-x-2 bg-pink-400 hover:bg-pink-500 transition duration-300 text-white px-4 py-2 rounded-full font-bold shadow-md">
+                <span class="text-xl">🛒</span>
+                <span>ตะกร้า</span>
+                <span id="cart-count" class="bg-white text-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-extrabold">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Notification/Alert Box -->
+    <div id="notification" class="fixed top-20 right-4 bg-green-500 text-white p-4 rounded-lg shadow-xl hidden opacity-0 z-50">
+        <!-- ข้อความแจ้งเตือนจะมาที่นี่ -->
+    </div>
+
+    <!-- Main Product Area -->
+    <div class="container mx-auto p-4 md:p-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">สินค้าอุปกรณ์การเรียนและเครื่องแบบ</h2>
+        
+        <!-- Product Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6" id="product-list">
+            <!-- Products will be injected here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Cart Modal (Contains Cart View and Form View) -->
+    <div id="cart-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50 p-4">
+        <div class="bg-white w-full max-w-lg rounded-xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+            
+            <!-- Close Button (Visible in both views) -->
+            <div class="flex justify-end">
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-800 text-3xl font-light leading-none">&times;</button>
+            </div>
+            
+            <!-- === View 1: Cart Items Summary === -->
+            <div id="cart-view">
+                <h2 class="text-2xl font-bold text-indigo-700 border-b pb-3 mb-4">🛒 สรุปรายการสั่งซื้อ</h2>
+                
+                <div id="cart-items" class="space-y-4 mb-6">
+                    <!-- Cart items will be displayed here -->
+                </div>
+    
+                <div class="border-t pt-4">
+                    <div class="flex justify-between text-2xl font-extrabold mb-4 text-indigo-800">
+                        <span>ยอดรวมทั้งหมด:</span>
+                        <span>฿<span id="total-price">0.00</span></span>
+                    </div>
+                    
+                    <button onclick="showOrderForm()" id="checkout-btn" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-lg hover:bg-green-700 transition duration-200 shadow-lg">
+                        ยืนยันการสั่งซื้อและดำเนินการต่อ
+                    </button>
+                    <p class="text-sm text-center text-gray-500 mt-2">ยอดนี้ยังไม่รวมค่าธรรมเนียม (ถ้ามี)</p>
+                </div>
+            </div>
+
+            <!-- === View 2: Student Information Form === -->
+            <div id="form-view" class="hidden">
+                <h2 class="text-2xl font-bold text-indigo-700 border-b pb-3 mb-4">ข้อมูลผู้สั่งซื้อ</h2>
+                
+                <div class="space-y-4 mb-6">
+                    <!-- Name Input -->
+                    <div>
+                        <label for="student-name" class="block text-sm font-medium text-gray-700">ชื่อ-นามสกุล:</label>
+                        <input type="text" id="student-name" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:border-indigo-500 focus:ring-indigo-500" required placeholder="เช่น นายสมชาย ใจดี">
+                    </div>
+                    <!-- ID Input -->
+                    <div>
+                        <label for="student-id" class="block text-sm font-medium text-gray-700">เลขประจำตัวนักเรียน (5 หลัก):</label>
+                        <input type="number" id="student-id" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:border-indigo-500 focus:ring-indigo-500" min="10000" max="99999" required placeholder="เช่น 12345">
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <button onclick="submitOrder()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-lg hover:bg-indigo-700 transition duration-200 shadow-lg mb-2">
+                        ยืนยันคำสั่งซื้อ
+                    </button>
+                    <button onclick="showCartView()" class="w-full bg-gray-200 text-gray-700 py-2 rounded-lg font-bold">ย้อนกลับไปแก้ไขตะกร้า</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Final Confirmation Modal (Replaces old alert) -->
+    <div id="confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-80 flex justify-center items-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-xl p-8 shadow-2xl text-center">
+            <div class="text-5xl mb-4">🎉</div>
+            <h2 class="text-3xl font-bold text-green-600 mb-4">คำสั่งซื้อสำเร็จ!</h2>
+            <p class="text-gray-700 mb-6">คำสั่งซื้อของคุณถูกบันทึกเรียบร้อยแล้ว กรุณาไปรับสินค้าตามรายละเอียดด้านล่าง:</p>
+            
+            <div id="order-summary-details" class="bg-gray-100 p-4 rounded-lg text-left text-sm mb-6 space-y-2">
+                <!-- Order details here -->
+            </div>
+
+            <p class="text-lg font-extrabold text-indigo-700">ยอดชำระ: ฿<span id="final-total">0.00</span> (ชำระเงินสด)</p>
+            <p class="text-sm text-red-500 mt-2">โปรดแจ้งชื่อและเลขประจำตัวนักเรียนที่จุดรับของสหกรณ์!</p>
+            
+            <button onclick="closeConfirmation()" class="mt-6 w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700">
+                ปิด
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        const products = [
+            { id: 1, name: 'สมุดบันทึก ปกอ่อน', price: 15.00, icon: '📓', sizeOptions: [] },
+            { id: 2, name: 'ปากกาลูกลื่น น้ำเงิน', price: 10.00, icon: '🖊️', sizeOptions: [] },
+            { id: 3, name: 'ดินสอ 2B', price: 8.00, icon: '✏️', sizeOptions: [] },
+            { id: 4, name: 'ยางลบ Staedtler', price: 5.00, icon: '⬜', sizeOptions: [] },
+            { id: 5, name: 'เสื้อนักเรียนชาย (คอปก)', price: 280.00, icon: '👔', sizeOptions: ['S', 'M', 'L', 'XL', 'XXL'] },
+            { id: 6, name: 'เสื้อนักเรียนหญิง (คอบัว)', price: 300.00, icon: '👚', sizeOptions: ['S', 'M', 'L', 'XL', 'XXL'] }
+        ];
+
+        let cart = [];
+
+        // Elements
+        const cartModal = document.getElementById('cart-modal');
+        const cartView = document.getElementById('cart-view');
+        const formView = document.getElementById('form-view');
+        const confirmationModal = document.getElementById('confirmation-modal');
+
+        // ฟังก์ชันแสดงข้อความแจ้งเตือน (แทน alert)
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.innerText = message;
+            notification.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
+            notification.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+            
+            // ทำให้ค่อยๆ โผล่ขึ้นมา
+            setTimeout(() => {
+                notification.style.opacity = '1';
+            }, 10); 
+
+            // ซ่อนอัตโนมัติ
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        // 1. แสดงรายการสินค้าในหน้าหลัก
+        function displayProducts() {
+            const list = document.getElementById('product-list');
+            list.innerHTML = products.map(p => `
+                <div class="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition duration-300 flex flex-col justify-between">
+                    <div class="text-center">
+                        <div class="text-6xl mb-3">${p.icon}</div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-1">${p.name}</h3>
+                        <p class="text-sm text-gray-500">${p.sizeOptions.length > 0 ? 'มีไซส์ให้เลือก' : 'ไม่มีไซส์'}</p>
+                        <p class="text-indigo-600 font-extrabold text-2xl mb-4">฿${p.price.toFixed(2)}</p>
+                    </div>
+                    
+                    ${p.sizeOptions.length > 0 ? `
+                        <div class="mb-4">
+                            <label for="size-${p.id}" class="block text-sm font-medium text-gray-700 text-left mb-1">เลือกไซส์:</label>
+                            <select id="size-${p.id}" class="w-full border border-gray-300 rounded-lg p-2 text-gray-700 focus:ring-indigo-500 focus:border-indigo-500">
+                                ${p.sizeOptions.map(size => `<option value="${size}">ไซส์ ${size}</option>`).join('')}
+                            </select>
+                        </div>
+                    ` : ''}
+
+                    <button onclick="addToCart(${p.id})" class="w-full bg-indigo-500 text-white py-2 rounded-lg font-semibold hover:bg-indigo-600 transition">
+                        + เพิ่มลงตะกร้า
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // 2. เพิ่มสินค้าลงในตะกร้า
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            let itemName = product.name;
+            let itemPrice = product.price;
+            let size = '';
+            
+            if(product.sizeOptions.length > 0) {
+                const sizeSelect = document.getElementById(`size-${id}`);
+                size = sizeSelect ? sizeSelect.value : product.sizeOptions[0]; // ใช้ค่าที่เลือกหรือค่าแรก
+                itemName += ` (ไซส์ ${size})`;
+            }
+
+            cart.push({ name: itemName, price: itemPrice, size: size, icon: product.icon });
+            updateCart();
+            showNotification(`✅ เพิ่ม ${itemName} ลงในตะกร้าแล้ว!`);
+        }
+
+        // 3. อัปเดตการแสดงผลตะกร้าและราคารวม
+        function updateCart() {
+            document.getElementById('cart-count').innerText = cart.length;
+            const cartItemsContainer = document.getElementById('cart-items');
+            const totalPrice = cart.reduce((sum, item) => sum + item.price, 0);
+            
+            document.getElementById('total-price').innerText = totalPrice.toFixed(2);
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">ตะกร้าว่างเปล่า! มาช้อปกันเถอะ</p>';
+                document.getElementById('checkout-btn').disabled = true;
+                return;
+            } else {
+                document.getElementById('checkout-btn').disabled = false;
+            }
+
+            // จัดกลุ่มรายการสินค้าที่ซ้ำกัน
+            const groupedCart = cart.reduce((acc, item) => {
+                const key = `${item.name}-${item.price}`;
+                if (!acc[key]) {
+                    acc[key] = { ...item, quantity: 0, indices: [] };
+                }
+                acc[key].quantity++;
+                acc[key].indices.push(cart.indexOf(item));
+                return acc;
+            }, {});
+
+            cartItemsContainer.innerHTML = Object.values(groupedCart).map(item => `
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">${item.icon}</span>
+                        <div>
+                            <span class="font-semibold text-gray-800">${item.name}</span>
+                            <p class="text-sm text-gray-500">฿${item.price.toFixed(2)} x ${item.quantity}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="font-bold text-indigo-700">฿${(item.price * item.quantity).toFixed(2)}</span>
+                        <button onclick="removeItemGroup('${item.name}')" class="text-red-500 hover:text-red-700 transition p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 4. ลบสินค้าออกจากตะกร้า
+        function removeItemGroup(itemName) {
+            cart = cart.filter(item => item.name !== itemName);
+            updateCart();
+            showNotification(`🗑️ ลบรายการสินค้า ${itemName} ออกจากตะกร้าแล้ว`);
+        }
+
+        // 5. เปิด/ปิด Modal ตะกร้า
+        function toggleCart() {
+            cartModal.classList.toggle('hidden');
+            if (!cartModal.classList.contains('hidden')) {
+                updateCart(); // อัปเดตข้อมูลล่าสุดเมื่อเปิดตะกร้า
+                showCartView(); // ตรวจสอบให้แน่ใจว่าแสดงหน้าตะกร้าก่อน
+            }
+        }
+
+        // 6. เปลี่ยนเป็นหน้าจอแสดงตะกร้า
+        function showCartView() {
+            cartView.classList.remove('hidden');
+            formView.classList.add('hidden');
+            document.getElementById('student-name').value = '';
+            document.getElementById('student-id').value = '';
+        }
+
+        // 7. เปลี่ยนเป็นหน้าจอให้กรอกฟอร์ม
+        function showOrderForm() {
+            if(cart.length === 0) {
+                showNotification('ตะกร้าว่างเปล่า! กรุณาเลือกสินค้าก่อน', true);
+                return;
+            }
+            cartView.classList.add('hidden');
+            formView.classList.remove('hidden');
+        }
+
+        // 8. ยืนยันการสั่งซื้อ (หลังกรอกฟอร์ม)
+        function submitOrder() {
+            const studentName = document.getElementById('student-name').value.trim();
+            const studentId = document.getElementById('student-id').value.trim();
+            const totalPrice = document.getElementById('total-price').innerText;
+
+            if (!studentName) {
+                return showNotification('กรุณากรอกชื่อ-นามสกุล', true);
+            }
+            if (!studentId || studentId.length !== 5 || isNaN(studentId)) {
+                return showNotification('กรุณากรอกเลขประจำตัวนักเรียน 5 หลักให้ถูกต้อง', true);
+            }
+            
+            // เตรียมข้อมูลสรุป
+            let orderSummaryHtml = `
+                <p><strong>ชื่อผู้สั่ง:</strong> ${studentName}</p>
+                <p><strong>เลขประจำตัว:</strong> ${studentId}</p>
+                <p class="mt-2 font-semibold">รายการ:</p>
+            `;
+
+            Object.values(cart.reduce((acc, item) => {
+                const key = `${item.name}-${item.price}`;
+                if (!acc[key]) acc[key] = { ...item, quantity: 0 };
+                acc[key].quantity++;
+                return acc;
+            }, {})).forEach(item => {
+                orderSummaryHtml += `<p class="ml-4">- ${item.name} x ${item.quantity} (฿${(item.price * item.quantity).toFixed(2)})</p>`;
+            });
+
+            // แสดง Confirmation Modal
+            document.getElementById('order-summary-details').innerHTML = orderSummaryHtml;
+            document.getElementById('final-total').innerText = totalPrice;
+            
+            cartModal.classList.add('hidden');
+            confirmationModal.classList.remove('hidden');
+        }
+
+        // 9. ปิด Modal ยืนยันและล้างตะกร้า
+        function closeConfirmation() {
+            confirmationModal.classList.add('hidden');
+            cart = [];
+            updateCart();
+            showNotification('🎉 ขอบคุณสำหรับคำสั่งซื้อ!');
+        }
+
+        // เริ่มต้นแอป
+        displayProducts();
+    </script>
+</body>
+</html>
